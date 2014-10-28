@@ -1,5 +1,8 @@
 /*
-	File: main.c
+	File: io.c
+
+	Contains function defintions for interacting with the IO pins on Atmel 
+	microcontrollers.
 
 	Created: 28/10/2014
 
@@ -35,17 +38,70 @@
 
 #include "io.h"
 
+/**********************************************************************************
+ * IO registers.
+ * 
+ */
+#ifdef ATMEGA328
+	volatile static unsigned char* _ports[] = {
+		&PORTB, &PORTC, &PORTD
+	};
+
+	volatile static unsigned char* _ddr[] = {
+		&DDRB, &DDRC, &DDRD
+	};
+#elif defined(ATTINY85)
+	volatile static unsigned char* _ports[] = {
+		&PORTB
+	};
+
+	volatile static unsigned char* _ddr[] = {
+		&DDRB
+	};
+#else
+	volatile static unsigned char* _ports[] = { };
+
+	volatile static unsigned char* _ddr[] = { };
+#endif
+	
+
 //////////////////////////////////////////////////////////////////////////
-///
-/// Entry Function
-/// 
-//////////////////////////////////////////////////////////////////////////
-int main(void)
+void io_write(unsigned int port, unsigned int pin, pin_output_t output)
 {
-	io_set_mode(PORT_B, 1, OUTPUT);
-	while(1) {
-		io_write(PORT_B, 1, HIGH);
+	// port doesn't exist
+	if(!(port < _PORT_LAST)) {
+		return;
 	}
 
-	return 0;
+	if(output == HIGH) {
+		*_ports[port] |= (1 << pin);
+	} else {
+		*_ports[port] &= ~(1 << pin);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+pin_output_t io_read(unsigned int port, unsigned int pin)
+{
+	// port doesn't exist
+	if(!(port < _PORT_LAST)) {
+		return LOW;
+	}
+
+	return (*_ports[port] & (1 << pin)) ? HIGH : LOW;
+}
+
+//////////////////////////////////////////////////////////////////////////
+void io_set_mode(unsigned int port, unsigned int pin, pin_mode_t mode)
+{
+	// port doesn't exist
+	if(!(port < _PORT_LAST)) {
+		return;
+	}
+
+	if(mode == OUTPUT) {
+		*_ddr[port] |= (1 << pin);
+	} else {
+		*_ddr[port] &= ~(1 << pin);
+	}
 }
