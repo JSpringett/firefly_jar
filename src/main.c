@@ -33,7 +33,19 @@
    POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define F_CPU 1000000UL
+
+#include <util/delay.h>
 #include "io.h"
+
+int song_a[] = {
+1,  0,  2,  1,  3,  4,  4,  0,  3,  1,  3,  3,  4,  2,  3,  1,  4,  0,  4,  2,  
+4,  1,  1,  1,  4,  2,  1,  2,  2,  3,  0,  1,  2,  2,  2,  2,  1,  3,  1,  0,  
+3,  1,  0,  0 , 1 , 0 , 0,  1,  2,  0,  1,  1,  3,  3  ,2  ,0  ,2  ,1  ,3  ,3 ,
+ 1 , 3,  1,  1,  3 , 3 , 0 , 2 , 1 , 0 , 0  ,3  ,1  ,0  ,0 , 3  ,4 , 3 , 3 , 0 , 
+ 4 , 0 , 0 , 2 , 0 , 2 , 4  ,2 , 3 , 1 , 2 , 2, 1,  4,  2, 0,  1,  3 , 0,  4,
+};
+
 
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -42,9 +54,27 @@
 //////////////////////////////////////////////////////////////////////////
 int main(void)
 {
+	int curr_index = 0;
+
+	io_set_mode(PORT_B, 0, OUTPUT);
 	io_set_mode(PORT_B, 1, OUTPUT);
+	io_set_mode(PORT_B, 2, OUTPUT);
+	io_set_mode(PORT_B, 3, OUTPUT);
+	io_set_mode(PORT_B, 4, OUTPUT);
+
 	while(1) {
-		io_write(PORT_B, 1, HIGH);
+		curr_index++;
+		if(curr_index == 100) {
+			curr_index = 0;
+		}
+
+		io_write(PORT_B, song_a[curr_index], HIGH);
+
+		_delay_ms(3000);
+
+		io_write(PORT_B, song_a[curr_index], LOW);
+
+		_delay_ms(6500);
 	}
 
 	return 0;

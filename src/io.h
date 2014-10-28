@@ -54,6 +54,9 @@ typedef enum {
 	INPUT = 0
 } pin_mode_t;
 
+/*
+	Contains the correct ports for the right microcontroller.
+ */
 #ifdef ATMEGA328
 	typedef enum {
 		PORT_B = 0,
